@@ -1,0 +1,12 @@
+[
+  { "name": "Citywalk 식당가 (荃新天地)", "area": "췬완 (숙소 근처)", "menu": "쇼핑몰 식당가 · 다양한 메뉴", "price": "$–$$", "kidMenu": false, "spicy": false, "queue": "짧음", "note": "숙소에서 걸어갈 수 있는 거리", "lat": 22.3705, "lng": 114.1113, "mapQuery": "Citywalk Tsuen Wan" },
+  { "name": "Royal Banquet Hall", "area": "디즈니랜드 (판타지랜드)", "menu": "아시아·서양 퀵서비스", "price": "$$", "kidMenu": true, "spicy": false, "queue": "보통", "note": "파크 어린이 식사권 사용처", "lat": 22.3128, "lng": 114.0418, "mapQuery": "Royal Banquet Hall Hong Kong Disneyland" },
+  { "name": "Explorer's Club Restaurant", "area": "디즈니랜드 (미스틱 포인트)", "menu": "아시아 요리 퀵서비스", "price": "$$", "kidMenu": true, "spicy": false, "queue": "보통", "note": "파크 어린이 식사권 사용처", "lat": 22.3114, "lng": 114.0393, "mapQuery": "Explorer's Club Restaurant Hong Kong Disneyland" },
+  { "name": "Starliner Diner", "area": "디즈니랜드 (투모로우랜드)", "menu": "버거 · 치킨", "price": "$$", "kidMenu": true, "spicy": false, "queue": "보통", "note": "파크 어린이 식사권 사용처", "lat": 22.3135, "lng": 114.0430, "mapQuery": "Starliner Diner Hong Kong Disneyland" },
+  { "name": "Tim Ho Wan 添好運 (홍콩역)", "area": "센트럴", "menu": "딤섬 · 차슈바오", "price": "$", "kidMenu": false, "spicy": false, "queue": "보통", "note": "", "lat": 22.2850, "lng": 114.1585, "mapQuery": "Tim Ho Wan Hong Kong Station" },
+  { "name": "Mak's Noodle 麥奀雲吞麵世家", "area": "센트럴", "menu": "완탕면", "price": "$", "kidMenu": false, "spicy": false, "queue": "보통", "note": "양이 적은 편", "lat": 22.2830, "lng": 114.1548, "mapQuery": "Mak's Noodle Wellington Street Central" },
+  { "name": "Lan Fong Yuen 蘭芳園", "area": "센트럴", "menu": "밀크티 · 포크찹번", "price": "$", "kidMenu": false, "spicy": false, "queue": "길다", "note": "자리가 좁음", "lat": 22.2836, "lng": 114.1546, "mapQuery": "Lan Fong Yuen Gage Street Central" },
+  { "name": "Kau Kee 九記牛腩", "area": "센트럴", "menu": "소고기 양지 국수 (맑은 국물)", "price": "$$", "kidMenu": false, "spicy": false, "queue": "길다", "note": "카레 국수는 맵게 느낄 수 있음", "lat": 22.2846, "lng": 114.1515, "mapQuery": "Kau Kee Restaurant Gough Street" },
+  { "name": "Australia Dairy Company 澳洲牛奶公司", "area": "조던", "menu": "스크램블 에그 토스트 · 우유 푸딩", "price": "$", "kidMenu": false, "spicy": false, "queue": "길다", "note": "회전이 빠름 · 합석", "lat": 22.3048, "lng": 114.1704, "mapQuery": "Australia Dairy Company Jordan" },
+  { "name": "Mammy Pancake 媽咪雞蛋仔", "area": "침사추이", "menu": "에그와플 (간식)", "price": "$", "kidMenu": false, "spicy": false, "queue": "보통", "note": "포장 위주", "lat": 22.2983, "lng": 114.1729, "mapQuery": "Mammy Pancake Carnarvon Road Tsim Sha Tsui" }
+]

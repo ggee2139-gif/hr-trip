@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>홍콩 가족여행</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#111827; --sub:#6b7280; --line:#e5e7eb; --accent:#0f766e; --warn:#b91c1c; --warnbg:#fee2e2; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0b0f14; --card:#151b23; --ink:#f3f4f6; --sub:#9ca3af; --line:#263040; --accent:#2dd4bf; --warn:#fca5a5; --warnbg:#3b1212; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:18px/1.45 system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; padding-bottom:84px; }
+  header { padding:14px 16px 6px; }
+  header h1 { font-size:20px; margin:0; }
+  header .plan { color:var(--sub); font-size:15px; }
+  main { padding:0 16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin:12px 0; }
+  .card h2 { font-size:17px; margin:0 0 8px; }
+  .big { font-size:40px; font-weight:700; }
+  .sub { color:var(--sub); font-size:14px; }
+  .alert { background:var(--warnbg); color:var(--warn); border-color:var(--warn); font-weight:600; }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-top:1px solid var(--line); }
+  .row:first-of-type { border-top:0; }
+  .row.stack { display:block; }
+  .row.stack > span { display:block; color:var(--ink); }
+  details summary { cursor:pointer; }
+  .err { color:var(--warn); font-size:15px; }
+  nav { position:fixed; bottom:0; left:0; right:0; display:flex; background:var(--card); border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom); }
+  nav button { flex:1; font-size:17px; padding:16px 0; border:0; background:none; color:var(--sub); }
+  nav button[aria-selected="true"] { color:var(--accent); font-weight:700; }
+  .filters { display:flex; flex-wrap:wrap; gap:8px; }
+  .filters label { background:var(--card); border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:15px; }
+  a { color:var(--accent); }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>홍콩 가족여행 11/18–11/22</h1>
+  <div class="plan" id="plan"></div>
+</header>
+<main>
+  <div id="alerts"></div>
+  <section id="tab-weather"></section>
+  <section id="tab-transit" hidden></section>
+  <section id="tab-food" hidden></section>
+</main>
+<nav role="tablist">
+  <button role="tab" data-tab="weather" aria-selected="true">날씨</button>
+  <button role="tab" data-tab="transit" aria-selected="false">교통</button>
+  <button role="tab" data-tab="food" aria-selected="false">먹거리</button>
+</nav>
+<script>
+// ---- 여행 기본값 ----
+const HOTEL = { name: 'Nina Hotel Tsuen Wan West', lat: 22.3687, lng: 114.1104 }; // 좌표는 근사값
+const PLAN = { '2026-11-18': '밤 홍콩 도착 → A31 버스로 숙소', '2026-11-19': '홍콩 디즈니랜드', '2026-11-20': '시내 관광', '2026-11-21': '시내 관광 · 23:00 공항 출발' };
+
+// MTR: 숙소역 + 자주 쓰는 역 (코드는 Next Train API로 확인함)
+const STATIONS = [
+  ['TML','TWW','췬완웨스트 (숙소)'], ['TML','NAC','남청 (퉁청선 환승)'], ['DRL','SUN','써니베이 → 디즈니'],
+  ['DRL','DIS','디즈니랜드 리조트'], ['TML','ETS','이스트침사추이'], ['TWL','CEN','센트럴'],
+];
+const DEST = { TUM:'툰문', WKS:'우카이샤', TSW:'췬완', CEN:'센트럴', SUN:'써니베이', DIS:'디즈니랜드', HOK:'홍콩역', TUC:'퉁청', ETS:'이스트침사추이', HUH:'훙함', TIS:'틴수이와이', KAT:'카이탁' };
+// A31 (KMB/LWB ETA API): 출발 정류장 ID와 방향
+const A31 = [
+  { title:'숙소(Nina Tower) → 공항', stop:'708870108A511AF7', dir:'O' },
+  { title:'공항(GTC) → 숙소', stop:'7CB61EFB024D9025', dir:'I' },
+];
+const HKO = 'https://data.weather.gov.hk/weatherAPI/opendata/weather.php?lang=en&dataType=';
+const PSR = { 'High':'높음', 'Medium High':'다소 높음', 'Medium':'보통', 'Medium Low':'다소 낮음', 'Low':'낮음' };
+
+// ---- 공통 ----
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hkt = (d, o) => new Intl.DateTimeFormat('ko-KR', { timeZone:'Asia/Hong_Kong', ...o }).format(d);
+const hktTime = d => hkt(d, { hour:'2-digit', minute:'2-digit', hour12:false });
+const hktDate = d => new Intl.DateTimeFormat('en-CA', { timeZone:'Asia/Hong_Kong' }).format(d); // YYYY-MM-DD
+
+// 받아온 데이터는 localStorage에 저장. 실패하면 저장본 + 마지막 업데이트 시각으로 대체.
+async function cached(key, url, parse = r => r.json()) {
+  try {
+    const res = await fetch(url, { cache:'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await parse(res);
+    try { localStorage.setItem(key, JSON.stringify({ t: Date.now(), data })); } catch {}
+    return { data, t: Date.now(), stale: false };
+  } catch (e) {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(key)); } catch {}
+    if (saved) return { data: saved.data, t: saved.t, stale: true, error: e.message };
+    return { data: null, error: e.message };
+  }
+}
+const stamp = r => r.stale ? `<div class="err">⚠ 연결 실패 — ${hktTime(new Date(r.t))} 기준 저장본 표시</div>`
+                           : `<div class="sub">업데이트 ${hktTime(new Date(r.t))} (HKT)</div>`;
+const fail = (what, r) => `<div class="card"><h2>${what}</h2><div class="err">불러오지 못했습니다 (${esc(r.error)}). 잠시 후 자동으로 다시 시도합니다.</div></div>`;
+
+// ---- 날씨 ----
+function warnAdvice(code) {
+  if (/^TC(8|9|10)/.test(code) || code === 'WRAINB') return '야외 일정 취소 권장 · 디즈니랜드/MTR 운행 공지 확인';
+  if (/^TC/.test(code) || code === 'WRAINR' || code === 'WTS') return '야외 일정 재검토 · 실내 위주로';
+  return '야외 일정 재검토';
+}
+async function loadWeather() {
+  const [now, fnd, warn] = await Promise.all([cached('w-now', HKO+'rhrread'), cached('w-fnd', HKO+'fnd'), cached('w-warn', HKO+'warnsum')]);
+  // 경보 → 맨 위
+  const warns = warn.data ? Object.values(warn.data).filter(w => w.actionCode !== 'CANCEL') : [];
+  $('alerts').innerHTML = warns.map(w => `<div class="card alert">⚠ ${esc(w.name)}${w.code && w.code !== w.name ? ' ('+esc(w.code)+')' : ''}<br>→ ${warnAdvice(w.code || '')}</div>`).join('')
+    + (warn.error && !warn.data ? `<div class="card err">경보 정보를 불러오지 못했습니다.</div>` : '');
+
+  let html = '';
+  if (now.data) {
+    const temps = now.data.temperature?.data || [];
+    const t = temps.find(x => /Tsuen Wan/i.test(x.place)) || temps.find(x => /Observatory/i.test(x.place)) || temps[0];
+    const hum = now.data.humidity?.data?.[0]?.value;
+    html += `<div class="card"><h2>지금 (${esc(t?.place)})</h2><div class="big">${t ? t.value + '°C' : '–'}</div>
+      <div class="sub">습도 ${hum ?? '–'}%</div>${(now.data.warningMessage || []).length ? `<div class="err">${esc([].concat(now.data.warningMessage).join(' '))}</div>` : ''}${stamp(now)}</div>`;
+  } else html += fail('지금 날씨', now);
+
+  if (fnd.data) {
+    const days = (fnd.data.weatherForecast || []).slice(0, 2);
+    html += `<div class="card"><h2>오늘 · 내일 예보</h2>` + days.map((d, i) =>
+      `<div class="row"><div><b>${i ? '내일' : '오늘'}</b> ${esc(d.forecastWeather)}<div class="sub">강수 가능성 ${esc(PSR[d.PSR] || d.PSR)}</div></div>
+       <div style="white-space:nowrap"><b>${d.forecastMintemp?.value}–${d.forecastMaxtemp?.value}°C</b></div></div>`).join('') + stamp(fnd) + `</div>`;
+  } else html += fail('예보', fnd);
+  $('tab-weather').innerHTML = html;
+}
+
+// ---- 교통 ----
+async function loadTransit() {
+  const mtr = await Promise.all(STATIONS.map(([l, s]) => cached(`m-${l}-${s}`, `https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=${l}&sta=${s}&lang=EN`)));
+  const bus = await Promise.all(A31.map(b => cached(`b-${b.stop}`, `https://data.etabus.gov.hk/v1/transport/kmb/eta/${b.stop}/A31/1`)));
+  const news = await cached('td-news', 'https://resource.data.one.gov.hk/td/en/specialtrafficnews.xml', async r => {
+    const xml = new DOMParser().parseFromString(await r.text(), 'text/xml');
+    return [...xml.getElementsByTagName('message')].map(m => ({ text: m.getElementsByTagName('EngShort')[0]?.textContent?.trim(), date: m.getElementsByTagName('ReferenceDate')[0]?.textContent?.trim() }));
+  });
+
+  let html = '<div class="card"><h2>🚇 MTR 다음 열차</h2>';
+  STATIONS.forEach(([l, s, name], i) => {
+    const r = mtr[i], d = r.data?.data?.[`${l}-${s}`];
+    if (!d) { html += `<div class="row"><b>${name}</b><span class="err">${r.data?.message ? esc(r.data.message) : '정보 없음'}</span></div>`; return; }
+    // ttnt(남은 분)는 받은 시점 기준이라 저장본에선 틀림 → 도착 시각(HKT)으로 다시 계산
+    const dirs = ['UP', 'DOWN'].filter(k => d[k]?.length).map(k => {
+      const mins = d[k].map(x => Math.round((new Date(x.time.replace(' ', 'T') + '+08:00') - Date.now()) / 60000)).filter(m => m >= 0).slice(0, 2);
+      return mins.length ? `${DEST[d[k][0].dest] || d[k][0].dest} 방면 ${mins.map(m => m ? m + '분' : '도착').join(', ')}` : '';
+    }).filter(Boolean);
+    html += `<div class="row stack"><b>${name}</b><span>${dirs.join('<br>') || '운행 정보 없음'}</span></div>`;
+  });
+  const okM = mtr.find(r => r.data); html += (okM ? stamp(okM) : '') + '</div>';
+
+  html += '<div class="card"><h2>🚌 A31 버스</h2>';
+  A31.forEach((b, i) => {
+    const r = bus[i];
+    if (!r.data) { html += `<div class="row"><b>${b.title}</b><span class="err">불러오기 실패</span></div>`; return; }
+    const etas = (r.data.data || []).filter(e => e.dir === b.dir && e.eta && new Date(e.eta) >= Date.now() - 60000).slice(0, 3);
+    const txt = etas.map(e => { const m = Math.max(0, Math.round((new Date(e.eta) - Date.now()) / 60000)); return `${hktTime(new Date(e.eta))} (${m}분)${e.rmk_en === 'Scheduled Bus' ? ' 예정' : ''}`; });
+    html += `<div class="row stack"><b>${b.title}</b><span>${txt.join('<br>') || '도착 정보 없음'}</span></div>`;
+  });
+  html += (bus[0].data ? stamp(bus[0]) : '') + '<div class="sub">"예정"은 실시간 위치가 아닌 시간표 기준입니다.</div></div>';
+
+  html += '<div class="card"><h2>⚠ 교통국 특별 교통 소식</h2>';
+  if (news.data) html += (news.data.length ? news.data.map(n => `<div class="row stack"><details><summary>${esc(n.text?.slice(0, 90))}${n.text?.length > 90 ? '…' : ''}</summary>${esc(n.text)}</details><div class="sub">${esc(n.date)}</div></div>`).join('') : '<div class="sub">현재 소식 없음</div>') + stamp(news);
+  else html += `<div class="err">불러오지 못했습니다 (${esc(news.error)})</div>`;
+  $('tab-transit').innerHTML = html + '</div>';
+}
+
+// ---- 먹거리 ----
+let foods = null, here = null;
+const km = (a, b) => { const R = 6371, r = x => x * Math.PI / 180, dLat = r(b.lat - a.lat), dLng = r(b.lng - a.lng);
+  return 2 * R * Math.asin(Math.sqrt(Math.sin(dLat / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(dLng / 2) ** 2)); };
+async function loadFood() {
+  if (!foods) {
+    const r = await cached('foods', 'foods.json');
+    foods = r.data;
+    if (!foods) { $('tab-food').innerHTML = fail('먹거리', r); return; }
+  }
+  if (!here) {
+    here = { ...HOTEL, label: '숙소 기준' };
+    navigator.geolocation?.getCurrentPosition(p => { here = { lat: p.coords.latitude, lng: p.coords.longitude, label: '현재 위치 기준' }; renderFood(); },
+      () => {}, { timeout: 8000, maximumAge: 300000 });
+  }
+  renderFood();
+}
+function renderFood() {
+  const f = id => $(id)?.checked;
+  const prev = { kid: f('f-kid'), mild: f('f-mild'), queue: f('f-queue') };
+  const list = foods.filter(x => (!prev.kid || x.kidMenu) && (!prev.mild || !x.spicy) && (!prev.queue || x.queue === '짧음'))
+    .map(x => ({ ...x, d: km(here, x) })).sort((a, b) => a.d - b.d);
+  $('tab-food').innerHTML = `<div class="card"><div class="filters">
+      <label><input type="checkbox" id="f-kid" ${prev.kid ? 'checked' : ''}> 아이 메뉴</label>
+      <label><input type="checkbox" id="f-mild" ${prev.mild ? 'checked' : ''}> 안 매움</label>
+      <label><input type="checkbox" id="f-queue" ${prev.queue ? 'checked' : ''}> 줄 짧음</label></div>
+      <div class="sub" style="margin-top:6px">${here.label} 거리순 · 직선거리</div></div>`
+    + (list.length ? list.map(x => `<div class="card"><h2>${esc(x.name)} <span class="sub">${x.d.toFixed(1)}km · ${esc(x.area)}</span></h2>
+        <div>${esc(x.menu)} · ${esc(x.price)}</div>
+        <div class="sub">${x.kidMenu ? '아이 메뉴 있음 · ' : ''}${x.spicy ? '매운 메뉴 위주 · ' : ''}줄 ${esc(x.queue)}${x.note ? ' · ' + esc(x.note) : ''}</div>
+        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.mapQuery)}" target="_blank" rel="noopener">구글맵에서 보기</a></div>`).join('')
+      : '<div class="card sub">조건에 맞는 곳이 없습니다. 필터를 줄여 보세요.</div>');
+  ['f-kid', 'f-mild', 'f-queue'].forEach(id => $(id).onchange = renderFood);
+}
+
+// ---- 탭 / 새로고침 ----
+const loaders = { weather: loadWeather, transit: loadTransit, food: loadFood };
+let current = 'weather';
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  current = b.dataset.tab;
+  document.querySelectorAll('nav button').forEach(x => x.setAttribute('aria-selected', x === b));
+  Object.keys(loaders).forEach(k => $('tab-' + k).hidden = k !== current);
+  loaders[current]();
+});
+const visible = () => document.visibilityState === 'visible';
+setInterval(() => visible() && loadWeather(), 10 * 60 * 1000); // 날씨·경보 10분
+setInterval(() => visible() && current === 'transit' && loadTransit(), 60 * 1000); // 교통 1분 (교통 탭일 때만)
+document.addEventListener('visibilitychange', () => { if (visible()) { loadWeather(); if (current === 'transit') loadTransit(); } });
+$('plan').textContent = '오늘: ' + (PLAN[hktDate(new Date())] || '여행 전/후') + ' · ' + hkt(new Date(), { month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }) + ' HKT';
+loadWeather();
+</script>
+</body>
+</html>
