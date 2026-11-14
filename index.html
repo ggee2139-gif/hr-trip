@@ -19,6 +19,13 @@
   .card h2 { font-size:17px; margin:0 0 8px; }
   .big { font-size:40px; font-weight:700; }
   .sub { color:var(--sub); font-size:14px; }
+  #food-map { height:340px; border-radius:14px; border:1px solid var(--line); margin:12px 0; z-index:0; }
+  .rg { background:var(--card); color:inherit; border:2px solid #0a7; border-radius:14px; padding:2px 6px; font-size:11px; font-weight:700; white-space:nowrap; text-align:center; width:max-content; transform:translate(-50%,-50%); box-shadow:0 1px 4px #0004; }
+  .chips { display:flex; gap:6px; overflow-x:auto; padding:2px 0 6px; }
+  .chip { flex:none; border:1px solid var(--line); background:var(--card); color:inherit; border-radius:16px; padding:6px 12px; font-size:14px; }
+  .chip.on { background:#0a7; border-color:#0a7; color:#fff; }
+  .rg.on { background:#0a7; color:#fff; }
+  .rg.hotel { border-color:#e55; }
   details.area > summary { font-size:17px; padding:10px 2px 0; cursor:pointer; }
   .alert { background:var(--warnbg); color:var(--warn); border-color:var(--warn); font-weight:600; }
   .row { display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-top:1px solid var(--line); }
@@ -35,6 +42,8 @@
   a { color:var(--accent); }
   [hidden] { display:none !important; }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 <body>
 <header>
@@ -181,13 +190,42 @@ async function loadFood() {
     navigator.geolocation?.getCurrentPosition(p => { here = { lat: p.coords.latitude, lng: p.coords.longitude, label: '현재 위치 기준' }; renderFood(); },
       () => {}, { timeout: 8000, maximumAge: 300000 });
   }
+  if (!$('food-body')) { $('tab-food').innerHTML = '<div id="food-map" hidden></div><div id="food-body"></div>'; initMap(); }
   renderFood();
+}
+let sel = '', map, rg = {};
+function initMap() {
+  if (!window.L) return;  // 오프라인이면 지도 없이 목록만
+  $('food-map').hidden = false;
+  map = L.map('food-map', { scrollWheelZoom: false });
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(map);
+  const by = {};
+  foods.forEach(x => (by[x.area] ||= []).push(x));
+  Object.entries(by).forEach(([area, xs]) => {
+    const c = [xs.reduce((s, x) => s + x.lat, 0) / xs.length, xs.reduce((s, x) => s + x.lng, 0) / xs.length];
+    const m = L.marker(c, { icon: L.divIcon({ className: '', html: '', iconSize: [0, 0] }) }).addTo(map);
+    m.on('click', () => pick(sel === area ? '' : area));
+    rg[area] = { m, c, n: xs.length };
+  });
+  L.marker([HOTEL.lat, HOTEL.lng], { icon: L.divIcon({ className: '', html: '<div class="rg hotel" style="padding:0 3px">🏨</div>', iconSize: [0, 0] }), interactive: false }).addTo(map);
+  paintMap();
+  fitAll();
+  setTimeout(() => map.invalidateSize(), 200);
+}
+const fitAll = () => map.fitBounds(Object.values(rg).map(r => r.c).concat([[HOTEL.lat, HOTEL.lng]]), { padding: [30, 30] });
+function paintMap() {
+  if (!map) return;
+  Object.entries(rg).forEach(([a, r]) => r.m.setIcon(L.divIcon({ className: '', iconSize: [0, 0], html: `<div class="rg ${sel === a ? 'on' : ''}">${esc(a.split(/ [·(]/)[0])} ${r.n}</div>` })));
+}
+function pick(a) {
+  sel = a; paintMap(); renderFood();
+  if (map) a ? map.flyTo(rg[a].c, 13, { duration: .6 }) : fitAll();
 }
 function renderFood() {
   const f = id => $(id)?.checked;
   const prev = { kid: f('f-kid'), mild: f('f-mild'), queue: f('f-queue'), type: $('f-type')?.value || '' };
   // 아이/매움/줄 필터는 맛집에만 적용, 명소는 그대로 둠
-  const list = foods.filter(x => (!prev.type || x.type === prev.type)
+  const list = foods.filter(x => (!sel || x.area === sel) && (!prev.type || x.type === prev.type)
       && (x.type !== '맛집' || ((!prev.kid || x.kidMenu) && (!prev.mild || !x.spicy) && (!prev.queue || x.queue === '짧음'))))
     .map(x => ({ ...x, d: km(here, x) })).sort((a, b) => a.d - b.d);
   const groups = {};  // 가까운 곳이 있는 지역부터 (list가 거리순이라 삽입 순서 = 지역 순서)
@@ -201,15 +239,19 @@ function renderFood() {
       ${link('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(x.mapQuery), '구글맵')}
       · ${link('https://search.naver.com/search.naver?where=blog&query=' + nq(x), x.blog ? '다른 후기' : '블로그 검색')}
       · ${link('https://search.naver.com/search.naver?where=image&query=' + nq(x), '사진')}</div>`;
-  $('tab-food').innerHTML = `<div class="card"><div class="filters">
+  const chips = Object.entries(foods.reduce((o, x) => (o[x.area] = (o[x.area] || 0) + 1, o), {}))
+    .map(([a, n]) => `<button class="chip ${sel === a ? 'on' : ''}" data-a="${esc(a)}">${esc(a.split(/ [·(]/)[0])} ${n}</button>`).join('');
+  $('food-body').innerHTML = `<div class="chips"><button class="chip ${sel ? '' : 'on'}" data-a="">전체 ${foods.length}</button>${chips}</div><div class="card"><div class="filters">
       <select id="f-type"><option value="">전체</option><option ${prev.type === '맛집' ? 'selected' : ''}>맛집</option><option ${prev.type === '명소' ? 'selected' : ''}>명소</option></select>
       <label><input type="checkbox" id="f-kid" ${prev.kid ? 'checked' : ''}> 아이 메뉴</label>
       <label><input type="checkbox" id="f-mild" ${prev.mild ? 'checked' : ''}> 안 매움</label>
       <label><input type="checkbox" id="f-queue" ${prev.queue ? 'checked' : ''}> 줄 짧음</label></div>
-      <div class="sub" style="margin-top:6px">${list.length}곳 · ${here.label} 가까운 지역순 · 직선거리</div></div>`
+      <div class="sub" style="margin-top:6px">${sel ? `📍 ${esc(sel)} · <a href="#" id="f-all">전체 지역 보기</a>` : '지도에서 지역을 눌러 보세요'} · ${list.length}곳 · ${here.label}</div></div>`
     + (list.length ? Object.entries(groups).map(([area, xs]) => `<details class="area" open><summary><b>${esc(area)}</b> <span class="sub">${xs.length}곳</span></summary>${xs.map(card).join('')}</details>`).join('')
       : '<div class="card sub">조건에 맞는 곳이 없습니다. 필터를 줄여 보세요.</div>');
   ['f-type', 'f-kid', 'f-mild', 'f-queue'].forEach(id => $(id).onchange = renderFood);
+  document.querySelectorAll('.chip').forEach(b => b.onclick = () => pick(b.dataset.a));
+  if ($('f-all')) $('f-all').onclick = e => { e.preventDefault(); pick(''); };
 }
 
 // ---- 탭 / 새로고침 ----
