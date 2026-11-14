@@ -7,7 +7,7 @@
   { "type": "맛집", "name": "Royal Banquet Hall", "area": "란타우 · 디즈니랜드", "menu": "아시아·서양 퀵서비스", "price": "$$", "kidMenu": true, "spicy": false, "queue": "보통", "note": "파크 어린이 식사권 사용처", "lat": 22.3128, "lng": 114.0418, "mapQuery": "Royal Banquet Hall Hong Kong Disneyland", "blog": "https://brunch.co.kr/@nonayo/57", "blogTitle": "홍콩 디즈니랜드 완전 정복 (파크 식당 후기 포함)" },
   { "type": "맛집", "name": "Explorer's Club Restaurant", "area": "란타우 · 디즈니랜드", "menu": "아시아 요리 퀵서비스", "price": "$$", "kidMenu": true, "spicy": false, "queue": "보통", "note": "파크 어린이 식사권 사용처", "lat": 22.3114, "lng": 114.0393, "mapQuery": "Explorer's Club Restaurant Hong Kong Disneyland", "blog": null },
   { "type": "맛집", "name": "Starliner Diner", "area": "란타우 · 디즈니랜드", "menu": "버거 · 치킨", "price": "$$", "kidMenu": true, "spicy": false, "queue": "보통", "note": "파크 어린이 식사권 사용처", "lat": 22.3135, "lng": 114.0430, "mapQuery": "Starliner Diner Hong Kong Disneyland", "blog": null },
-  { "type": "명소", "name": "옹핑360 케이블카 · 빅부다", "area": "란타우 · 디즈니랜드", "menu": "케이블카 · 천단대불 · 포린사", "price": "", "note": "퉁청역에서 탑승. 운행 여부 확인", "lat": 22.2540, "lng": 113.9050, "mapQuery": "Ngong Ping 360 Tian Tan Buddha", "blog": null },
+  { "type": "명소", "name": "옹핑360 케이블카 · 빅부다", "area": "란타우 · 디즈니랜드", "menu": "케이블카 · 천단대불 · 포린사", "price": "", "note": "퉁청역에서 탑승. 운행 여부 확인", "lat": 22.2540, "lng": 113.9050, "mapQuery": "Ngong Ping 360 Tian Tan Buddha", "blog": "https://brunch.co.kr/@hanbici/129", "blogTitle": "홍콩 이야기(14): 란타우 섬 탐방기" },
   { "type": "명소", "name": "타이오 마을", "area": "란타우 · 디즈니랜드", "menu": "수상가옥 어촌 마을 · 말린 해산물", "price": "", "note": "옹핑에서 버스 약 10분", "lat": 22.2530, "lng": 113.8620, "mapQuery": "Tai O Fishing Village", "blog": "https://brunch.co.kr/@mddhk/57", "blogTitle": "홍콩에 가면 섬에 들르세요 - 타이오 편" },
   { "type": "명소", "name": "시티게이트 아울렛", "area": "란타우 · 디즈니랜드", "menu": "아울렛 쇼핑몰", "price": "", "note": "퉁청역 바로 앞 · 공항 가는 날 들르기 좋음", "lat": 22.2890, "lng": 113.9410, "mapQuery": "Citygate Outlets Tung Chung", "blog": null },
 
@@ -65,5 +65,36 @@
 
   { "type": "명소", "name": "치린 수도원 · 난리안 가든", "area": "구룡 동부 · 사이쿵", "menu": "당나라식 사원과 정원", "price": "", "note": "무료 · 다이아몬드힐역", "lat": 22.3405, "lng": 114.2050, "mapQuery": "Chi Lin Nunnery Nan Lian Garden", "blog": "https://brunch.co.kr/@qrssa/2244", "blogTitle": "홍콩 현지인이 추천하는 숨은 여행지 BEST 5" },
   { "type": "명소", "name": "웡타이신 사원 黃大仙祠", "area": "구룡 동부 · 사이쿵", "menu": "소원 비는 도교 사원", "price": "", "note": "웡타이신역", "lat": 22.3425, "lng": 114.1935, "mapQuery": "Wong Tai Sin Temple", "blog": null },
-  { "type": "명소", "name": "사이쿵 해산물 거리", "area": "구룡 동부 · 사이쿵", "menu": "바닷가 마을 · 수조 해산물 식당", "price": "", "note": "해산물 조리비 비쌈", "lat": 22.3815, "lng": 114.2735, "mapQuery": "Sai Kung Seafood Street", "blog": "https://brunch.co.kr/@real0406/26", "blogTitle": "홍콩의 한적한 바다 힐링 장소" }
+  { "type": "명소", "name": "사이쿵 해산물 거리", "area": "구룡 동부 · 사이쿵", "menu": "바닷가 마을 · 수조 해산물 식당", "price": "", "note": "해산물 조리비 비쌈", "lat": 22.3815, "lng": 114.2735, "mapQuery": "Sai Kung Seafood Street", "blog": "https://brunch.co.kr/@real0406/26", "blogTitle": "홍콩의 한적한 바다 힐링 장소" },
+
+  { "type": "명소", "name": "홍콩 습지공원", "area": "신계 (샤틴 · 타이포 · 습지공원)", "menu": "생태 공원 · 아이와 산책", "price": "", "note": "요일별 휴무 있음 · 방문 전 확인", "lat": 22.4690, "lng": 114.0090, "mapQuery": "Hong Kong Wetland Park", "blog": null },
+  { "type": "명소", "name": "만불사 萬佛寺 (샤틴)", "area": "신계 (샤틴 · 타이포 · 습지공원)", "menu": "수많은 불상이 늘어선 사원", "price": "", "note": "언덕 계단이 많음 · 아이와는 체력 고려", "lat": 22.3830, "lng": 114.1850, "mapQuery": "Ten Thousand Buddhas Monastery Sha Tin", "blog": null },
+  { "type": "명소", "name": "홍콩 철도박물관 (타이포)", "area": "신계 (샤틴 · 타이포 · 습지공원)", "menu": "옛 기차와 역사 전시", "price": "", "note": "", "lat": 22.4510, "lng": 114.1650, "mapQuery": "Hong Kong Railway Museum Tai Po", "blog": null },
+
+  { "type": "명소", "name": "청차우 섬", "area": "라마섬 · 청차우", "menu": "차 없는 섬 · 자전거 · 해변", "price": "", "note": "센트럴 선착장에서 페리 약 1시간", "lat": 22.2090, "lng": 114.0280, "mapQuery": "Cheung Chau Island Hong Kong", "blog": "https://brunch.co.kr/@joogangl/346", "blogTitle": "211106 홍콩 청차우 섬 여행기" },
+  { "type": "명소", "name": "라마섬 (용수완 ~ 소쿠완 산책)", "area": "라마섬 · 청차우", "menu": "섬 트레킹 · 어촌 마을", "price": "", "note": "초급 코스 · 센트럴 4번 부두에서 페리", "lat": 22.2200, "lng": 114.1130, "mapQuery": "Lamma Island Yung Shue Wan Sok Kwu Wan", "blog": "https://brunch.co.kr/@joogangl/323", "blogTitle": "210912 주윤발의 고향인 홍콩 라마섬에 가다" },
+  { "type": "맛집", "name": "소쿠완 해산물 식당가", "area": "라마섬 · 청차우", "menu": "수조에서 고르는 해산물 요리", "price": "$$$", "kidMenu": false, "spicy": false, "queue": "보통", "note": "조리비 비쌈 · 가격 먼저 확인", "lat": 22.2080, "lng": 114.1250, "mapQuery": "Sok Kwu Wan seafood restaurants", "blog": null },
+  { "type": "맛집", "name": "청차우 항구 해산물 거리", "area": "라마섬 · 청차우", "menu": "해산물 · 간식", "price": "$$", "kidMenu": false, "spicy": false, "queue": "보통", "note": "항구 근처에 모여 있음", "lat": 22.2100, "lng": 114.0290, "mapQuery": "Cheung Chau waterfront seafood restaurants", "blog": null },
+
+  { "type": "명소", "name": "드래곤스백 트레일 (용의 등뼈)", "area": "홍콩섬 남부", "menu": "바다 전망 하이킹", "price": "", "note": "그늘 적고 바람 셈 · 초급이지만 아이는 짧은 구간만", "lat": 22.2330, "lng": 114.2300, "mapQuery": "Dragon's Back Trail Hong Kong", "blog": "https://brunch.co.kr/@courbet/32", "blogTitle": "홍콩 트레일의 백미, 드래곤 백 트레일" },
+  { "type": "명소", "name": "섹오 마을 · 섹오 해변", "area": "홍콩섬 남부", "menu": "한적한 해변 마을", "price": "", "note": "", "lat": 22.2290, "lng": 114.2490, "mapQuery": "Shek O Beach Village", "blog": "https://brunch.co.kr/@courbet/33", "blogTitle": "시간이 정지된 아름다운 해변, 섹오 마을" },
+
+  { "type": "명소", "name": "홍콩 트램 (딩딩)", "area": "센트럴 · 셩완", "menu": "2층 트램 · 완차이 방향 이동", "price": "", "note": "옥토퍼스 카드 사용", "lat": 22.2800, "lng": 114.1580, "mapQuery": "Hong Kong Tramways Central", "blog": "https://brunch.co.kr/@dlsen0115/50", "blogTitle": "홍콩을 만나는 색다른 방법. 트램" },
+  { "type": "명소", "name": "홍콩 동식물원", "area": "센트럴 · 셩완", "menu": "작은 동물원 · 식물원 산책", "price": "", "note": "아이와 가볍게 걷기 좋음", "lat": 22.2780, "lng": 114.1590, "mapQuery": "Hong Kong Zoological and Botanical Gardens", "blog": null },
+  { "type": "명소", "name": "홍콩 공원 (Hong Kong Park)", "area": "센트럴 · 셩완", "menu": "새장 · 온실 · 연못", "price": "", "note": "도심 속 휴식", "lat": 22.2770, "lng": 114.1620, "mapQuery": "Hong Kong Park Admiralty", "blog": null },
+  { "type": "명소", "name": "타이쿤 (大館)", "area": "센트럴 · 셩완", "menu": "옛 경찰서를 고친 문화 공간", "price": "", "note": "", "lat": 22.2830, "lng": 114.1520, "mapQuery": "Tai Kwun Central", "blog": null },
+  { "type": "맛집", "name": "피치 Pici (센트럴)", "area": "센트럴 · 셩완", "menu": "이탈리안 파스타", "price": "$$", "kidMenu": true, "spicy": false, "queue": "보통", "note": "정확한 위치는 구글맵으로 확인", "lat": 22.2820, "lng": 114.1555, "mapQuery": "Pici Central Hong Kong", "blog": "https://brunch.co.kr/@eliarhocapt/43", "blogTitle": "[홍콩맛집] Pici Central(피치) 후기" },
+  { "type": "맛집", "name": "융키 鏞記", "area": "센트럴 · 셩완", "menu": "거위구이 · 광둥 요리", "price": "$$$", "kidMenu": false, "spicy": false, "queue": "보통", "note": "예약 권장", "lat": 22.2808, "lng": 114.1560, "mapQuery": "Yung Kee Restaurant Central", "blog": null },
+
+  { "type": "맛집", "name": "페닌슐라 더 로비 애프터눈티", "area": "침사추이", "menu": "영국식 애프터눈 티 세트", "price": "$$$", "kidMenu": true, "spicy": false, "queue": "길다", "note": "대기 길거나 예약 필요 · 가격은 공식 확인", "lat": 22.2950, "lng": 114.1720, "mapQuery": "The Peninsula Hong Kong The Lobby", "blog": "https://brunch.co.kr/@courbet/36", "blogTitle": "홍콩 최초 영국식 애프터눈 티, 페닌슐라 더 로비" },
+  { "type": "명소", "name": "청킹맨션", "area": "침사추이", "menu": "다국적 상점이 모인 오래된 건물", "price": "", "note": "소지품 주의 · 구경 위주", "lat": 22.2985, "lng": 114.1730, "mapQuery": "Chungking Mansions", "blog": "https://brunch.co.kr/@nycjenny/9", "blogTitle": "청킹맨션" },
+  { "type": "명소", "name": "하버시티", "area": "침사추이", "menu": "대형 쇼핑몰 · 실내라 날씨 무관", "price": "", "note": "유모차 이동 편함", "lat": 22.2950, "lng": 114.1680, "mapQuery": "Harbour City Tsim Sha Tsui", "blog": null },
+  { "type": "명소", "name": "홍콩 역사박물관", "area": "침사추이", "menu": "홍콩 역사 전시", "price": "", "note": "아이와 실내 일정으로 좋음", "lat": 22.3010, "lng": 114.1740, "mapQuery": "Hong Kong Museum of History", "blog": null },
+  { "type": "명소", "name": "홍콩 우주박물관", "area": "침사추이", "menu": "천문 전시 · 돔 영상관", "price": "", "note": "운영·휴관일 확인", "lat": 22.2945, "lng": 114.1720, "mapQuery": "Hong Kong Space Museum", "blog": null },
+
+  { "type": "명소", "name": "금붕어 시장 · 꽃시장", "area": "야우마테이 · 조던 · 몽콕", "menu": "금붕어 거리 · 꽃 시장", "price": "", "note": "레이디스 마켓 근처", "lat": 22.3250, "lng": 114.1730, "mapQuery": "Goldfish Market Mong Kok", "blog": null },
+
+  { "type": "명소", "name": "블루하우스 (완차이)", "area": "완차이 · 코즈웨이베이", "menu": "옛 건물 · 옛 우체국", "price": "", "note": "트램 코스와 묶기 좋음", "lat": 22.2745, "lng": 114.1730, "mapQuery": "Blue House Wan Chai", "blog": "https://brunch.co.kr/@ondisplay/14", "blogTitle": "홍콩에서 가장 오래된 건물 완차이 블루 하우스" },
+  { "type": "명소", "name": "타임스퀘어 · 코즈웨이베이 쇼핑", "area": "완차이 · 코즈웨이베이", "menu": "대형 쇼핑몰 · 번화가", "price": "", "note": "", "lat": 22.2780, "lng": 114.1830, "mapQuery": "Times Square Causeway Bay", "blog": null },
+  { "type": "명소", "name": "빅토리아 공원", "area": "완차이 · 코즈웨이베이", "menu": "무료 공원 · 현지인 산책", "price": "", "note": "", "lat": 22.2820, "lng": 114.1880, "mapQuery": "Victoria Park Causeway Bay", "blog": null }
 ]
