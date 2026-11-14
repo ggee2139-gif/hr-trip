@@ -195,7 +195,9 @@ function renderFood() {
     + (list.length ? list.map(x => `<div class="card"><h2>${esc(x.name)} <span class="sub">${x.d.toFixed(1)}km · ${esc(x.area)}</span></h2>
         <div>${esc(x.menu)} · ${esc(x.price)}</div>
         <div class="sub">${x.kidMenu ? '아이 메뉴 있음 · ' : ''}${x.spicy ? '매운 메뉴 위주 · ' : ''}줄 ${esc(x.queue)}${x.note ? ' · ' + esc(x.note) : ''}</div>
-        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.mapQuery)}" target="_blank" rel="noopener">구글맵에서 보기</a></div>`).join('')
+        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.mapQuery)}" target="_blank" rel="noopener">구글맵에서 보기</a>
+        · <a href="https://search.naver.com/search.naver?where=blog&query=${encodeURIComponent('홍콩 ' + x.name.replace(/[^\x00-\x7F].*$/, '').trim())}" target="_blank" rel="noopener">블로그 후기</a>
+        · <a href="https://search.naver.com/search.naver?where=image&query=${encodeURIComponent('홍콩 ' + x.name.replace(/[^\x00-\x7F].*$/, '').trim())}" target="_blank" rel="noopener">사진</a></div>`).join('')
       : '<div class="card sub">조건에 맞는 곳이 없습니다. 필터를 줄여 보세요.</div>');
   ['f-kid', 'f-mild', 'f-queue'].forEach(id => $(id).onchange = renderFood);
 }
