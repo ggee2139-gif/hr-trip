@@ -19,6 +19,7 @@
   .card h2 { font-size:17px; margin:0 0 8px; }
   .big { font-size:40px; font-weight:700; }
   .sub { color:var(--sub); font-size:14px; }
+  details.area > summary { font-size:17px; padding:10px 2px 0; cursor:pointer; }
   .alert { background:var(--warnbg); color:var(--warn); border-color:var(--warn); font-weight:600; }
   .row { display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-top:1px solid var(--line); }
   .row:first-of-type { border-top:0; }
@@ -184,22 +185,31 @@ async function loadFood() {
 }
 function renderFood() {
   const f = id => $(id)?.checked;
-  const prev = { kid: f('f-kid'), mild: f('f-mild'), queue: f('f-queue') };
-  const list = foods.filter(x => (!prev.kid || x.kidMenu) && (!prev.mild || !x.spicy) && (!prev.queue || x.queue === '짧음'))
+  const prev = { kid: f('f-kid'), mild: f('f-mild'), queue: f('f-queue'), type: $('f-type')?.value || '' };
+  // 아이/매움/줄 필터는 맛집에만 적용, 명소는 그대로 둠
+  const list = foods.filter(x => (!prev.type || x.type === prev.type)
+      && (x.type !== '맛집' || ((!prev.kid || x.kidMenu) && (!prev.mild || !x.spicy) && (!prev.queue || x.queue === '짧음'))))
     .map(x => ({ ...x, d: km(here, x) })).sort((a, b) => a.d - b.d);
+  const groups = {};  // 가까운 곳이 있는 지역부터 (list가 거리순이라 삽입 순서 = 지역 순서)
+  list.forEach(x => (groups[x.area] ||= []).push(x));
+  const link = (u, t) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
+  const nq = x => encodeURIComponent('홍콩 ' + x.name);
+  const card = x => `<div class="card"><h2>${esc(x.name)} <span class="sub">${x.type} · ${x.d.toFixed(1)}km</span></h2>
+      <div>${esc(x.menu)}${x.price ? ' · ' + esc(x.price) : ''}</div>
+      <div class="sub">${x.type === '맛집' ? `${x.kidMenu ? '아이 메뉴 있음 · ' : ''}${x.spicy ? '매운 메뉴 위주 · ' : ''}줄 ${esc(x.queue)}` : ''}${x.type === '맛집' && x.note ? ' · ' : ''}${esc(x.note || '')}</div>
+      ${x.blog ? `<div class="sub" style="margin:6px 0">📝 ${link(x.blog, esc(x.blogTitle || '블로그 후기'))}</div>` : ''}
+      ${link('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(x.mapQuery), '구글맵')}
+      · ${link('https://search.naver.com/search.naver?where=blog&query=' + nq(x), x.blog ? '다른 후기' : '블로그 검색')}
+      · ${link('https://search.naver.com/search.naver?where=image&query=' + nq(x), '사진')}</div>`;
   $('tab-food').innerHTML = `<div class="card"><div class="filters">
+      <select id="f-type"><option value="">전체</option><option ${prev.type === '맛집' ? 'selected' : ''}>맛집</option><option ${prev.type === '명소' ? 'selected' : ''}>명소</option></select>
       <label><input type="checkbox" id="f-kid" ${prev.kid ? 'checked' : ''}> 아이 메뉴</label>
       <label><input type="checkbox" id="f-mild" ${prev.mild ? 'checked' : ''}> 안 매움</label>
       <label><input type="checkbox" id="f-queue" ${prev.queue ? 'checked' : ''}> 줄 짧음</label></div>
-      <div class="sub" style="margin-top:6px">${here.label} 거리순 · 직선거리</div></div>`
-    + (list.length ? list.map(x => `<div class="card"><h2>${esc(x.name)} <span class="sub">${x.d.toFixed(1)}km · ${esc(x.area)}</span></h2>
-        <div>${esc(x.menu)} · ${esc(x.price)}</div>
-        <div class="sub">${x.kidMenu ? '아이 메뉴 있음 · ' : ''}${x.spicy ? '매운 메뉴 위주 · ' : ''}줄 ${esc(x.queue)}${x.note ? ' · ' + esc(x.note) : ''}</div>
-        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.mapQuery)}" target="_blank" rel="noopener">구글맵에서 보기</a>
-        · <a href="https://search.naver.com/search.naver?where=blog&query=${encodeURIComponent('홍콩 ' + x.name.replace(/[^\x00-\x7F].*$/, '').trim())}" target="_blank" rel="noopener">블로그 후기</a>
-        · <a href="https://search.naver.com/search.naver?where=image&query=${encodeURIComponent('홍콩 ' + x.name.replace(/[^\x00-\x7F].*$/, '').trim())}" target="_blank" rel="noopener">사진</a></div>`).join('')
+      <div class="sub" style="margin-top:6px">${list.length}곳 · ${here.label} 가까운 지역순 · 직선거리</div></div>`
+    + (list.length ? Object.entries(groups).map(([area, xs]) => `<details class="area" open><summary><b>${esc(area)}</b> <span class="sub">${xs.length}곳</span></summary>${xs.map(card).join('')}</details>`).join('')
       : '<div class="card sub">조건에 맞는 곳이 없습니다. 필터를 줄여 보세요.</div>');
-  ['f-kid', 'f-mild', 'f-queue'].forEach(id => $(id).onchange = renderFood);
+  ['f-type', 'f-kid', 'f-mild', 'f-queue'].forEach(id => $(id).onchange = renderFood);
 }
 
 // ---- 탭 / 새로고침 ----
