@@ -149,7 +149,18 @@ async function loadWeather() {
       (kr.stale ? stamp(kr) : `<div class="sub">서울: wttr.in 기준 · 홍콩: 홍콩천문대</div>`) + `</div>`;
   }
   // 옷차림 (홍콩 예보 기준, 오늘·내일 중 더 추운 최저 / 더 더운 최고)
-  if (hkD.length) {
+  const hh = await cached('w-hk-h', 'https://wttr.in/Hong+Kong?format=j1');
+  const wear = f => f >= 28 ? '반팔·반바지' : f >= 24 ? '반팔 + 얇은 긴바지' : f >= 21 ? '반팔 + 얇은 가디건' : f >= 18 ? '긴팔 + 가벼운 재킷' : '긴팔 + 두꺼운 겉옷';
+  const days = hh.data?.weather?.slice(0, 2);
+  if (days?.length) {
+    html += `<div class="card"><h2>👕 시간대별 옷차림 (홍콩)</h2>` + days.map((w, i) =>
+      `<div class="sub" style="margin-top:8px"><b>${i ? '내일' : '오늘'}</b></div>` + w.hourly.filter(h => +h.time >= 600).map(h => {
+        const f = +h.FeelsLikeC, r = +h.chanceofrain, hr = String(+h.time / 100).padStart(2, '0');
+        return `<div class="row"><div><b>${hr}시</b> ${h.tempC}°C <span class="sub">(체감 ${f}°C)</span></div><div style="text-align:right">${wear(f)}${r >= 40 ? ' ☔ 우산' : ''}</div></div>`;
+      }).join('')).join('') +
+      `<ul style="margin:8px 0 0 18px;padding:0;line-height:1.6"><li>실내(쇼핑몰·MTR·버스) 에어컨이 강함 → 얇은 겉옷은 항상 챙기기</li><li>8살 아이: 여벌 티셔츠 한 벌 (디즈니랜드는 많이 걸음)</li><li>11/18 출발일은 서울이 더 추움 → 공항까지는 겉옷, 도착 후 가방에</li></ul>` +
+      (hh.stale ? stamp(hh) : `<div class="sub">시간대별: wttr.in 기준 (체감온도로 판단, 홍콩 현지 시각)</div>`) + `</div>`;
+  } else if (hkD.length) {
     const lo = Math.min(...hkD.map(d => d.forecastMintemp.value)), hi = Math.max(...hkD.map(d => d.forecastMaxtemp.value));
     const wet = hkD.some(d => /High|Medium High/.test(d.PSR));
     const top = hi >= 28 ? '반팔 + 반바지/얇은 바지, 선크림·모자' : hi >= 24 ? '반팔 + 얇은 긴바지, 얇은 겉옷 하나' : hi >= 20 ? '긴팔 티 + 가벼운 가디건/얇은 재킷' : hi >= 16 ? '긴팔 + 니트/가벼운 재킷' : '두꺼운 겉옷 + 긴바지';
