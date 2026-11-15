@@ -137,6 +137,32 @@ async function loadWeather() {
       `<div class="row"><div><b>${i ? '내일' : '오늘'}</b> ${esc(d.forecastWeather)}<div class="sub">강수 가능성 ${esc(PSR[d.PSR] || d.PSR)}</div></div>
        <div style="white-space:nowrap"><b>${d.forecastMintemp?.value}–${d.forecastMaxtemp?.value}°C</b></div></div>`).join('') + stamp(fnd) + `</div>`;
   } else html += fail('예보', fnd);
+  // 서울 비교 (wttr.in, 키 없음)
+  const kr = await cached('w-kr', 'https://wttr.in/Seoul?format=j1');
+  const krD = kr.data?.weather?.slice(0, 2).map(w => ({ lo: +w.mintempC, hi: +w.maxtempC, rain: Math.max(...w.hourly.map(h => +h.chanceofrain)) }));
+  const hkD = (fnd.data?.weatherForecast || []).slice(0, 2);
+  if (krD?.length) {
+    const krNow = +kr.data.current_condition[0].temp_C, hkNow = now.data ? (now.data.temperature?.data || []).find(x => /Tsuen Wan/i.test(x.place))?.value : null;
+    html += `<div class="card"><h2>서울 날씨 비교</h2>
+      <div class="row"><div><b>지금</b> 서울 ${krNow}°C${hkNow != null ? ` · 홍콩 ${hkNow}°C` : ''}</div><div><b>${hkNow != null ? (hkNow - krNow >= 0 ? '+' : '') + (hkNow - krNow) + '°C' : ''}</b></div></div>` +
+      krD.map((k, i) => { const h = hkD[i]; return `<div class="row"><div><b>${i ? '내일' : '오늘'}</b> 서울 ${k.lo}–${k.hi}°C, 비 ${k.rain}%${h ? `<div class="sub">홍콩 ${h.forecastMintemp.value}–${h.forecastMaxtemp.value}°C (평균 ${((h.forecastMintemp.value + h.forecastMaxtemp.value - k.lo - k.hi) / 2).toFixed(0)}°C 더 따뜻함)</div>` : ''}</div></div>`; }).join('') +
+      (kr.stale ? stamp(kr) : `<div class="sub">서울: wttr.in 기준 · 홍콩: 홍콩천문대</div>`) + `</div>`;
+  }
+  // 옷차림 (홍콩 예보 기준, 오늘·내일 중 더 추운 최저 / 더 더운 최고)
+  if (hkD.length) {
+    const lo = Math.min(...hkD.map(d => d.forecastMintemp.value)), hi = Math.max(...hkD.map(d => d.forecastMaxtemp.value));
+    const wet = hkD.some(d => /High|Medium High/.test(d.PSR));
+    const top = hi >= 28 ? '반팔 + 반바지/얇은 바지, 선크림·모자' : hi >= 24 ? '반팔 + 얇은 긴바지, 얇은 겉옷 하나' : hi >= 20 ? '긴팔 티 + 가벼운 가디건/얇은 재킷' : hi >= 16 ? '긴팔 + 니트/가벼운 재킷' : '두꺼운 겉옷 + 긴바지';
+    html += `<div class="card"><h2>👕 오늘·내일 옷차림 (홍콩 ${lo}–${hi}°C)</h2>
+      <div class="row"><div><b>${top}</b></div></div>
+      <ul style="margin:8px 0 0 18px;padding:0;line-height:1.6">
+        ${hi - lo >= 6 ? '<li>아침·저녁 일교차 큼 → 벗기 쉬운 겹쳐 입기</li>' : ''}
+        <li>실내(쇼핑몰·MTR·버스) 에어컨이 강함 → 얇은 겉옷은 항상 챙기기</li>
+        ${wet ? '<li>비 가능성 높음 → 우산·우비, 젖어도 되는 신발</li>' : ''}
+        <li>8살 아이: 땀 많이 나는 날은 여벌 티셔츠 한 벌 (디즈니랜드는 걷는 양이 많음)</li>
+        <li>서울 출발 11/18은 서울이 더 추움 → 공항까지는 겉옷, 도착 후 벗어서 가방에</li>
+      </ul></div>`;
+  }
   $('tab-weather').innerHTML = html;
 }
 
